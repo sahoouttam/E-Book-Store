@@ -61,6 +61,7 @@ public class BookClientTests {
                 .verifyComplete();
     }
 
+    @Test
     void whenBookNotExistsThenReturnEmpty() {
         String bookIsbn = "1234567891";
 
