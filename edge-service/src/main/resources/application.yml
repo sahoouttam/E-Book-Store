@@ -33,6 +33,7 @@ spring:
           max-life-time: 60s
       default-filters:
         - SaveSession
+        - TokenRelay
         - name: RequestRateLimiter
           args:
             redis-rate-limiter:
@@ -68,6 +69,10 @@ spring:
             - name: CircuitBreaker
               args:
                 name: orderCircuitBreaker
+        - id: spa-route
+          uri: ${SPA_URL:http://localhost:9004}
+          predicates:
+            - Path=/,/*.css,/*.js,/favicon.ico
   redis:
     connect-timeout: 2s
     host: localhost
@@ -86,11 +91,13 @@ spring:
           keycloak:
             client-id: edge-service
             client-secret: polar-keycloak-secret
-            scope: openid
+            scope: openid,roles
         provider:
           keycloak:
             issue-url: http://localhost:8080/realms/bookstore
-
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/bookstore
 
 resilience4j:
   circuitbreaker:
