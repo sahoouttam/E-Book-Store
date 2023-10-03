@@ -20,7 +20,7 @@ public class BookJsonTests {
     @Test
     public void testSerialize() throws Exception {
         Instant now = Instant.now();
-        Book book = new Book(394L, "1234567890", "Title", "Author", 9.90, now, now, 21);
+        Book book = new Book(394L, "1234567890", "Title", "Author", 9.90, "Bookstore", now, now, "jenny", "eline", 21);
         JsonContent<Book> jsonContent = json.write(book);
         assertThat(jsonContent).extractingJsonPathStringValue("@.id").isEqualTo(book.id());
         assertThat(jsonContent).extractingJsonPathStringValue("@.isbn").isEqualTo(book.isbn());
@@ -29,6 +29,8 @@ public class BookJsonTests {
         assertThat(jsonContent).extractingJsonPathStringValue("@.price").isEqualTo(book.price());
         assertThat(jsonContent).extractingJsonPathStringValue("@.createdDate").isEqualTo(book.createdDate());
         assertThat(jsonContent).extractingJsonPathStringValue("@.lastModifiedDate").isEqualTo(book.lastModifiedDate());
+        assertThat(jsonContent).extractingJsonPathStringValue("@.createdBy").isEqualTo(book.createdBy());
+        assertThat(jsonContent).extractingJsonPathStringValue("@.lastModifiedBy").isEqualTo(book.lastModifiedBy());
         assertThat(jsonContent).extractingJsonPathStringValue("@.version").isEqualTo(book.version());
     }
 
@@ -44,11 +46,14 @@ public class BookJsonTests {
             "price": 9.90,
             "createdDate": "2021-09-07T22:50:37.135029Z",
             "lastModifiedDate": "2021-09-07T22:50:37.135029Z",
+            "createdBy": "jenny",
+            "lastModifiedBy": "eline",
             "version": 21
           }
           """;
         assertThat(json.parse(content))
                 .usingRecursiveComparison()
-                .isEqualTo(new Book(394L, "1234567890", "Title", "Author", 9.90, instant, instant, 21));
+                .isEqualTo(new Book(394L, "1234567890", "Title", "Author", 9.90, "Bookstore",
+                        instant, instant, "jenny", "eline", 21));
     }
 }
