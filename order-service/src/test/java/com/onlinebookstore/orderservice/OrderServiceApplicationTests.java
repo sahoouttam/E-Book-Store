@@ -1,5 +1,7 @@
 package com.onlinebookstore.orderservice;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onlinebookstore.orderservice.book.Book;
 import com.onlinebookstore.orderservice.book.BookClient;
@@ -17,6 +19,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -34,8 +38,11 @@ import static org.mockito.BDDMockito.given;
 @Testcontainers
 class OrderServiceApplicationTests {
 
+
+
 	@Container
-	static PostgreSQLContainer<?> postgresql = new PostgreSQLContainer<>(DockerImageName.parse("postgres:14.4"));
+	static PostgreSQLContainer<?> postgresql =
+			new PostgreSQLContainer<>(DockerImageName.parse("postgres:14.4"));
 
 	@Autowired
 	private ObjectMapper objectMapper;
@@ -132,5 +139,26 @@ class OrderServiceApplicationTests {
 		assertThat(createdOrder.bookIsbn()).isEqualTo(orderRequest.isbn());
 		assertThat(createdOrder.quantity()).isEqualTo(orderRequest.quantity());
 		assertThat(createdOrder.status()).isEqualTo(OrderStatus.REJECTED);
+	}
+
+	private static KeycloakToken authenticateWith(String username, String password, WebClient webClient) {
+		return webClient
+				.post()
+				.body(BodyInserters.fromFormData("grant_type", "password")
+						.with("client_id", "order-test")
+						.with("username", username)
+						.with("password", password)
+				)
+				.retrieve()
+				.bodyToMono(KeycloakToken.class)
+				.block();
+	}
+
+	private record KeycloakToken(String accessToken) {
+
+		@JsonCreator
+		private KeycloakToken(@JsonProperty("access_token") final String accessToken) {
+			this.accessToken = accessToken;
+		}
 	}
 }
