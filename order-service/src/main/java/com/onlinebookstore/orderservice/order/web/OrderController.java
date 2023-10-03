@@ -2,6 +2,8 @@ package com.onlinebookstore.orderservice.order.web;
 
 import com.onlinebookstore.orderservice.order.domain.Order;
 import com.onlinebookstore.orderservice.order.domain.OrderService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,8 +24,8 @@ public class OrderController {
     }
 
     @GetMapping
-    public Flux<Order> getAllOrders() {
-        return orderService.getAllOrders();
+    public Flux<Order> getAllOrders(@AuthenticationPrincipal Jwt jwt) {
+        return orderService.getAllOrders(jwt.getSubject());
     }
 
     public Mono<Order> submitOrder(@RequestBody @Valid OrderRequest orderRequest) {

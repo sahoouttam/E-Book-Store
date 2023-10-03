@@ -10,6 +10,8 @@ import com.onlinebookstore.orderservice.order.domain.OrderStatus;
 import com.onlinebookstore.orderservice.order.event.OrderAcceptedMessage;
 import com.onlinebookstore.orderservice.order.web.OrderRequest;
 import dasniko.testcontainers.keycloak.KeycloakContainer;
+import io.netty.handler.codec.http2.Http2Headers;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,6 +19,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.stream.binder.test.OutputDestination;
 import org.springframework.cloud.stream.binder.test.TestChannelBinderConfiguration;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -79,6 +83,17 @@ class OrderServiceApplicationTests {
 				postgresql.getDatabaseName());
 	}
 
+	@BeforeAll
+	static void generateAccessTokens() {
+		WebClient webClient = WebClient.builder()
+				.baseUrl(keycloakContainer.getAuthServerUrl() + "realms/bookstore/protocol/openid-connect/token")
+				.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+				.build();
+
+		isabelleTokens = authenticateWith("isabelle", "password", webClient);
+		bjornTokens = authenticateWith("bjorn", "password", webClient);
+	}
+
 	@Test
 	void whenGetOwnOrdersThenReturn() throws IOException {
 		String bookIsbn = "1234567893";
@@ -95,8 +110,7 @@ class OrderServiceApplicationTests {
 				.returnResult()
 				.getResponseBody();
 		assertThat(expectedOrder).isNotNull();
-		assertThat(objectMapper
-				.readValue(output.receive().getPayload(), OrderAcceptedMessage.class))
+		assertThat(objectMapper.readValue(output.receive().getPayload(), OrderAcceptedMessage.class))
 				.isEqualTo(new OrderAcceptedMessage(expectedOrder.id()));
 
 		webTestClient.get().uri("/orders")
@@ -128,8 +142,7 @@ class OrderServiceApplicationTests {
 				.returnResult()
 				.getResponseBody();
 		assertThat(orderByBjorn).isNotNull();
-		assertThat(objectMapper
-				.readValue(output.receive().getPayload(), OrderAcceptedMessage.class))
+		assertThat(objectMapper.readValue(output.receive().getPayload(), OrderAcceptedMessage.class))
 				.isEqualTo(new OrderAcceptedMessage(orderByBjorn.id()));
 
 		Order orderByIsabelle = webTestClient.post()
