@@ -1,5 +1,6 @@
 package com.onlinebookstore.catalogservice;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.onlinebookstore.catalogservice.domain.Book;
 import dasniko.testcontainers.keycloak.KeycloakContainer;
@@ -195,6 +196,7 @@ class CatalogServiceApplicationTests {
 
 	private record KeycloakToken(String accessToken) {
 
+		@JsonCreator
 		private KeycloakToken(@JsonProperty("access_token") final String accessToken) {
 			this.accessToken = accessToken;
 		}
