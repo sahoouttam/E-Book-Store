@@ -72,7 +72,7 @@ public class OrderRepositoryR2dbcTests {
 
     @Test
     @WithMockUser("marlen")
-    void whenCreateOrderAuthenticatedThenNoAuditMetaData() {
+    void whenCreateOrderAuthenticatedThenAuditMetaData() {
         Order rejectedOrder = OrderService.buildRejectedOrder("1234567890", 3);
         StepVerifier.create(orderRepository.save(rejectedOrder))
                 .expectNextMatches(order -> order.createdBy().equals("marlen") &&
