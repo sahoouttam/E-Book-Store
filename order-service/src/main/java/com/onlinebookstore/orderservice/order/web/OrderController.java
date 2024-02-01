@@ -4,10 +4,7 @@ import com.onlinebookstore.orderservice.order.domain.Order;
 import com.onlinebookstore.orderservice.order.domain.OrderService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -28,6 +25,7 @@ public class OrderController {
         return orderService.getAllOrders(jwt.getSubject());
     }
 
+    @PostMapping
     public Mono<Order> submitOrder(@RequestBody @Valid OrderRequest orderRequest) {
         return orderService.submitOrder(orderRequest.isbn(), orderRequest.quantity());
     }

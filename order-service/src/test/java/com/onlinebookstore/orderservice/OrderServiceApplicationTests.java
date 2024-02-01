@@ -10,7 +10,6 @@ import com.onlinebookstore.orderservice.order.domain.OrderStatus;
 import com.onlinebookstore.orderservice.order.event.OrderAcceptedMessage;
 import com.onlinebookstore.orderservice.order.web.OrderRequest;
 import dasniko.testcontainers.keycloak.KeycloakContainer;
-import io.netty.handler.codec.http2.Http2Headers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

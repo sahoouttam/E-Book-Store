@@ -14,9 +14,7 @@ public record Order(
         String bookIsbn,
         String bookName,
         Double bookPrice,
-
         Integer quantity,
-
         OrderStatus status,
 
         @CreatedDate
