@@ -18,6 +18,7 @@ public class SecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .authorizeRequests(authorize -> authorize
+                        .mvcMatchers("/actuator/**").permitAll()
                         .mvcMatchers(HttpMethod.GET, "/", "/books/**").permitAll()
                         .anyRequest().hasRole("employee")
                 )
